@@ -17,6 +17,7 @@ import com.tes.games.whackaword.viewmodel.VocabularyGameViewModel
 fun VocabularyGameApp() {
     val viewModel: VocabularyGameViewModel = viewModel()
 
+
     // Track the current game screen
     var currentScreen by remember { mutableStateOf(Screen.EntranceScreen) }
 

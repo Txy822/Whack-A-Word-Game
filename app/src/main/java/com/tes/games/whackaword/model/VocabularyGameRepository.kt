@@ -1,10 +1,5 @@
 package com.tes.games.whackaword.model
 
-import javax.inject.Inject
-
-class VocabularyGameRepository @Inject constructor(
-    private val dataSource:VocabularyGameDataSource
-){
-
-
+interface VocabularyGameRepository {
+    fun getVocabularyItems():List<VocabularyItem>
 }

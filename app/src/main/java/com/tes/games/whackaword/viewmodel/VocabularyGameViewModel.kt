@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tes.games.whackaword.R
+import com.tes.games.whackaword.model.VocabularyGameRepository
 import com.tes.games.whackaword.model.VocabularyItem
 import com.tes.games.whackaword.view.GameResult
 import com.tes.games.whackaword.view.GameState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,8 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class VocabularyGameViewModel(
+@HiltViewModel
+class VocabularyGameViewModel @Inject constructor(
+    private val repository: VocabularyGameRepository
 ) : ViewModel() {
     private val mediaPlayer = MediaPlayer()
     // val context = LocalContext.current

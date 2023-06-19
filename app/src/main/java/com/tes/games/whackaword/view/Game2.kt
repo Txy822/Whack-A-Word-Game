@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tes.games.whackaword.R
 import com.tes.games.whackaword.model.VocabularyItem
 import com.tes.games.whackaword.viewmodel.VocabularyGameViewModel
+import com.tes.games.whackaword.viewmodel.VocabularyGameViewModel2
 import kotlin.random.Random
 
 @Composable
@@ -44,7 +45,9 @@ fun GameScreen2() {
     val holes = remember { generateRandomHoles(9) }
     var clicked = remember { false }
     val viewModel: VocabularyGameViewModel = viewModel()
-    val vocabularyItems = viewModel.vocabularyItems
+    val viewModel2: VocabularyGameViewModel2 = viewModel()
+    val vocabularyItems2 = viewModel.vocabularyItems
+    val vocabularyItems = viewModel2.getList()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val handler = Handler()
@@ -59,19 +62,6 @@ fun GameScreen2() {
         selectedList.add(selectedItem)
     }
 
-
-//    selectedItem = selectRandomVocabularyItem(vocabularyItems)
-//    val itemTwo =selectedItem
-//
-//    selectedItem = selectRandomVocabularyItem(vocabularyItems)
-//    val itemThree =selectedItem
-//
-//    selectedItem = selectRandomVocabularyItem(vocabularyItems)
-//    val itemFour =selectedItem
-//
-//    selectedItem = selectRandomVocabularyItem(vocabularyItems)
-//    val itemFive =selectedItem
-//
 
 
     var cardCounter = 5
