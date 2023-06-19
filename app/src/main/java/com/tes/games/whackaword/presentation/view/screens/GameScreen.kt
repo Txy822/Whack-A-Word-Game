@@ -1,4 +1,4 @@
-package com.tes.games.whackaword.view
+package com.tes.games.whackaword.presentation.view.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tes.games.whackaword.model.VocabularyItem
-import com.tes.games.whackaword.view.components.VocabularyCard
+import com.tes.games.whackaword.domain.model.VocabularyItem
+import com.tes.games.whackaword.presentation.view.components.GameResult
+import com.tes.games.whackaword.presentation.view.components.GameState
+import com.tes.games.whackaword.presentation.view.components.VocabularyCard
 
 @Composable
 fun GameScreen(

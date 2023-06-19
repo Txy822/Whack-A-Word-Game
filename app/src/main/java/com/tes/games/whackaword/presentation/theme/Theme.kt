@@ -1,4 +1,4 @@
-package com.tes.games.whackaword.ui.theme
+package com.tes.games.whackaword.presentation.theme
 
 import android.app.Activity
 import android.os.Build

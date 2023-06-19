@@ -1,6 +1,5 @@
-package com.tes.games.whackaword.view.components
+package com.tes.games.whackaword.presentation.view.components
 
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -23,10 +22,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tes.games.whackaword.model.VocabularyItem
+import com.tes.games.whackaword.domain.model.VocabularyItem
 
 @Composable
 fun VocabularyCard(

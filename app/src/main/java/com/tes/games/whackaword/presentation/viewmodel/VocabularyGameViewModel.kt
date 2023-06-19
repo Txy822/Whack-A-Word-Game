@@ -1,14 +1,14 @@
-package com.tes.games.whackaword.viewmodel
+package com.tes.games.whackaword.presentation.viewmodel
 
 import android.media.MediaPlayer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tes.games.whackaword.R
-import com.tes.games.whackaword.model.VocabularyGameRepository
-import com.tes.games.whackaword.model.VocabularyItem
-import com.tes.games.whackaword.view.GameResult
-import com.tes.games.whackaword.view.GameState
+import com.tes.games.whackaword.domain.model.VocabularyItem
+import com.tes.games.whackaword.domain.repository.VocabularyGameRepository
+import com.tes.games.whackaword.presentation.view.components.GameResult
+import com.tes.games.whackaword.presentation.view.components.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

@@ -1,4 +1,4 @@
-package com.tes.games.whackaword
+package com.tes.games.whackaword.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,8 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.tes.games.whackaword.ui.theme.WhackAWordTheme
-import com.tes.games.whackaword.view.VocabularyGameApp
+import com.tes.games.whackaword.presentation.theme.WhackAWordTheme
+import com.tes.games.whackaword.presentation.view.screens.VocabularyGameApp
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

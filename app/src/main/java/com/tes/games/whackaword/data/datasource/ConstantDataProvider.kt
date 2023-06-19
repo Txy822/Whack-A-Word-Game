@@ -1,6 +1,7 @@
-package com.tes.games.whackaword.model
+package com.tes.games.whackaword.data.datasource
 
 import com.tes.games.whackaword.R
+import com.tes.games.whackaword.domain.model.VocabularyItem
 
 class ConstantDataProvider {
 
@@ -15,6 +16,7 @@ class ConstantDataProvider {
             VocabularyItem("Egg", R.drawable.fc_egg, R.raw.fc_egg),
             VocabularyItem("Orange", R.drawable.fc_orange, R.raw.fc_orange),
             VocabularyItem("Potato", R.drawable.fc_potato, R.raw.fc_potato),
-            VocabularyItem("Tomato", R.drawable.fc_tomato, R.raw.fc_tomato))
+            VocabularyItem("Tomato", R.drawable.fc_tomato, R.raw.fc_tomato)
+        )
     }
 }

@@ -1,4 +1,4 @@
-package com.tes.games.whackaword.view
+package com.tes.games.whackaword.presentation.view.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -9,9 +9,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tes.games.whackaword.R
-import com.tes.games.whackaword.model.VocabularyItem
+import com.tes.games.whackaword.domain.model.VocabularyItem
+import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
 import com.tes.games.whackaword.util.Screen
-import com.tes.games.whackaword.viewmodel.VocabularyGameViewModel
 
 @Composable
 fun VocabularyGameApp() {
@@ -86,13 +86,3 @@ fun VocabularyGameApp() {
     */
 }
 
-sealed class GameState {
-    object Playing : GameState()
-    object Success : GameState()
-    object Failure : GameState()
-}
-
-sealed class GameResult(val message: String) {
-    object Win : GameResult("Congratulations! You won!")
-    object Lose : GameResult("Oops! Better luck next time!")
-}

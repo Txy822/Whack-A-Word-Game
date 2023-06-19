@@ -1,4 +1,4 @@
-package com.tes.games.whackaword.view
+package com.tes.games.whackaword.presentation.view.screens
 
 import android.os.Handler
 import androidx.compose.foundation.BorderStroke
@@ -17,6 +17,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -35,69 +37,65 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tes.games.whackaword.R
-import com.tes.games.whackaword.model.VocabularyItem
-import com.tes.games.whackaword.viewmodel.VocabularyGameViewModel
-import com.tes.games.whackaword.viewmodel.VocabularyGameViewModel2
+import com.tes.games.whackaword.presentation.view.components.MediaPlayerComponent
+import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
+import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel2
 import kotlin.random.Random
 
 @Composable
 fun GameScreen2() {
+    val context = LocalContext.current
     val holes = remember { generateRandomHoles(9) }
     var clicked = remember { false }
     val viewModel: VocabularyGameViewModel = viewModel()
     val viewModel2: VocabularyGameViewModel2 = viewModel()
+    val vocabularyItems by viewModel2.vocabularyItems.collectAsState()
+    val selectedVocabularyItems by viewModel2.selectedVocabularyItems.collectAsState()
+    val targetVocabularyItem by viewModel2.targetVocabularyItem.collectAsState()
+    val mediaPlayerState by viewModel2.mediaPlayerState.collectAsState()
+    val level by viewModel2.level.collectAsState()
+    //val selectedItems: List<VocabularyItem> = viewModel2.getSelectedVocabularyItems()
     val vocabularyItems2 = viewModel.vocabularyItems
-    val vocabularyItems = viewModel2.getList()
+    //val vocabularyItems = viewModel2.getList()
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+
     val handler = Handler()
 
 
-    val selectedList = mutableListOf<VocabularyItem>()
-    for (i in 0..4) {
-        var selectedItem = selectRandomVocabularyItem(vocabularyItems)
-        while (selectedList.contains(selectedItem)) {
-            selectedItem = selectRandomVocabularyItem(vocabularyItems)
-        }
-        selectedList.add(selectedItem)
-    }
-
-
-
-    var cardCounter = 5
+    var cardCounter = 3
     Box(
         modifier = Modifier
             .padding(top = 200.dp)
             .fillMaxSize()
             .background(Color(0xFFCCBA85)) // Green ground color
     ) {
+        val numbers = listOf(1, 2, 3, 4, 5)
+        val randomNumbers = numbers.shuffled().take(3)
+        var  i  =1;
+        var cardVisible=true
         for (hole in holes) {
-
-            if (cardCounter % 2 == 0) {
-                Hole(hole, visible = false, selectedList[cardCounter - 1].image) {}
-
-            } else {
-                if (cardCounter == 3) {
-                    var a = Hole(hole, visible = true, selectedList[cardCounter - 1].image) {}
-                    MediaPlayerComponent(context, selectedList[cardCounter - 1], true)
-//                    LaunchedEffect(Unit) {
-//                        delay(10000L) // Delay for 1 second
-//                    }
-                    a = Hole(hole, visible = true, R.drawable.tick) {}
-                    MediaPlayerComponent(context, VocabularyItem("",0, R.raw.correct), true)
-
-
-                } else {
-                    Hole(hole, visible = true, selectedList[cardCounter - 1].image) {}
-                }
+            if(randomNumbers.contains(i)){
+                cardVisible =true
+                Hole(position = hole, cardVisible = cardVisible, playAudioForSelectedCard= mediaPlayerState, selectedVocabularyItems[i-1]?.image ?: R.drawable.ic_launcher_background) {viewModel2.increaseLevel()}
             }
+            else {
+                cardVisible =false
+                Hole(position = hole, cardVisible = cardVisible, playAudioForSelectedCard= mediaPlayerState, selectedVocabularyItems[cardCounter - 1]?.image ?: R.drawable.ic_launcher_background) {viewModel2.increaseLevel()}
+            }
+
+            //Hole(hole, visible = false, selectedVocabularyItems[cardCounter - 1]?.image ?:  R.drawable.ic_launcher_background) {}
+           // viewModel2.mediaPlayerState
             cardCounter--
+            i++
         }
+        println("level: $level")
+        MediaPlayerComponent(context, targetVocabularyItem, true)
     }
+
 }
 
 @Composable
-fun Hole(position: Offset, visible: Boolean, img: Int, clicked: () -> Unit) {
+fun Hole(position: Offset, cardVisible: Boolean, playAudioForSelectedCard:Boolean, img: Int, clicked: () -> Unit) {
     val holeSize = 200.dp
 
 //    OvalWithBorder()
@@ -115,7 +113,7 @@ fun Hole(position: Offset, visible: Boolean, img: Int, clicked: () -> Unit) {
             style = Stroke(width = 8.dp.toPx())
         )
     }
-    if (visible) {
+    if (cardVisible) {
         ImageCard(position = position, holeSize = holeSize, img, clicked = clicked)
     }
     /*
@@ -152,7 +150,7 @@ fun generateRandomHoles(count: Int): List<Offset> {
 
     // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
-    holes.add(Offset(randomX.value + (800), randomY.value))
+    holes.add(Offset(randomX.value + (800), randomY.value-100))
 
 //    }
 
@@ -167,7 +165,10 @@ fun ImageCard(position: Offset, holeSize: Dp, img: Int, clicked: () -> Unit) {
             .size(holeSize, holeSize + 100.dp)
             .padding(16.dp)
             .offset(position.x.dp + 110.dp, position.y.dp - 110.dp)
-            .clickable { clicked },
+            .clickable { clicked()
+                //viewModel.increaseLevel()
+                       },
+
         colors = CardDefaults.cardColors(colorResource(id = R.color.light_ray)),
         elevation = CardDefaults.cardElevation(1.dp),
 //        shape = RoundedCornerShape(16.dp),
@@ -199,46 +200,3 @@ fun ImageCard(position: Offset, holeSize: Dp, img: Int, clicked: () -> Unit) {
         }
     }
 }
-
-
-@Composable
-fun OvalWithBorder() {
-    val canvasColor = Color.Transparent
-    val ovalColor = Color.Blue
-    val borderColor = Color.Red
-    val borderWidth = 4.dp
-    val ovalSize = Size(width = 250.dp.value, height = 120.dp.value)
-    val canvasModifier = Modifier
-        .size(ovalSize.width.dp, ovalSize.height.dp)
-
-    Box(
-        modifier = Modifier.size(width = 250.dp, 120.dp)
-    ) {
-        Canvas(modifier = canvasModifier) {
-            drawRect(color = Color.Transparent)
-            drawOval(
-                brush = Brush.horizontalGradient(listOf(borderColor, borderColor)),
-                size = ovalSize,
-                topLeft = Offset(x = 0f, y = 0f),
-                style = Stroke(width = borderWidth.toPx()),
-            )
-        }
-    }
-}
-
-fun selectRandomVocabularyItem(
-    vocabularyItems: List<VocabularyItem>,
-): VocabularyItem {
-    if (vocabularyItems.isEmpty()) {
-        return VocabularyItem("", 0, 0)
-    }
-    val randomIndex = Random.nextInt(vocabularyItems.size)
-
-//    val updatedList = vocabularyItems.toMutableList()
-//    updatedList.removeAt(randomIndex)
-
-    // Update the list of vocabulary items
-    // You can use viewModel or mutableStateOf to handle the list
-    return vocabularyItems[randomIndex]
-}
-

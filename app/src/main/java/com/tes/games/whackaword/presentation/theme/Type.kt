@@ -1,4 +1,4 @@
-package com.tes.games.whackaword.ui.theme
+package com.tes.games.whackaword.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

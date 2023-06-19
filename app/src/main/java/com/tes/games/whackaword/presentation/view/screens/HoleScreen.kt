@@ -1,4 +1,4 @@
-package com.tes.games.whackaword.view
+package com.tes.games.whackaword.presentation.view.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
