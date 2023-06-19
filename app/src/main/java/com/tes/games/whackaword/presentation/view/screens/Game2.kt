@@ -54,6 +54,8 @@ fun GameScreen2() {
     val targetVocabularyItem by viewModel2.targetVocabularyItem.collectAsState()
     val mediaPlayerState by viewModel2.mediaPlayerState.collectAsState()
     val level by viewModel2.level.collectAsState()
+    val resetGame by viewModel2.resetGame.collectAsState()
+    val startGame by viewModel2.startGame.collectAsState()
     //val selectedItems: List<VocabularyItem> = viewModel2.getSelectedVocabularyItems()
     val vocabularyItems2 = viewModel.vocabularyItems
     //val vocabularyItems = viewModel2.getList()
@@ -62,43 +64,65 @@ fun GameScreen2() {
     val handler = Handler()
 
 
-    var cardCounter = 3
-    Box(
-        modifier = Modifier
-            .padding(top = 200.dp)
-            .fillMaxSize()
-            .background(Color(0xFFCCBA85)) // Green ground color
-    ) {
-        val numbers = listOf(0, 1, 2, 3, 4)
-        val randomNumbers = numbers.shuffled().take(3)
-        val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
-        var j = 0
-        var k =0
-        for ((i, hole) in holes.withIndex()) {
-            if (randomNumbers.contains(i)) {
-                Hole(
-                    position = hole,
-                    cardVisible = true,
-                    playAudioForSelectedCard = mediaPlayerState,
-                    selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
-                ) { viewModel2.increaseLevel() }
-                j++
-            } else {
-                Hole(
-                    position = hole,
-                    cardVisible = false,
-                    playAudioForSelectedCard = mediaPlayerState,
-                    selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
-                ) { viewModel2.increaseLevel() }
-                k++
+    if(resetGame|| startGame){
+        var cardCounter = 3
+        Box(
+            modifier = Modifier
+                .padding(top = 200.dp)
+                .fillMaxSize()
+                .background(Color(0xFFCCBA85)) // Green ground color
+        ) {
+            val numbers = listOf(0, 1, 2, 3, 4)
+            val randomNumbers = numbers.shuffled().take(3)
+            val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
+            var j = 0
+            var k =0
+            for ((i, hole) in holes.withIndex()) {
+                if (randomNumbers.contains(i)) {
+                    Hole(
+                        position = hole,
+                        cardVisible = true,
+                        playAudioForSelectedCard = mediaPlayerState,
+                        selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+                    ) { viewModel2.increaseLevel() }
+                    j++
+                } else {
+                    Hole(
+                        position = hole,
+                        cardVisible = false,
+                        playAudioForSelectedCard = mediaPlayerState,
+                        selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
+                    ) { viewModel2.increaseLevel() }
+                    k++
+                }
+                MediaPlayerComponent(context, targetVocabularyItem, true)
             }
         }
-        println("level: $level")
-        MediaPlayerComponent(context, targetVocabularyItem, true)
     }
-
 }
 
+/*
+            for ((i, hole) in holes.withIndex()) {
+                if (randomNumbers.contains(i)) {
+                    Hole(
+                        position = hole,
+                        cardVisible = true,
+                        playAudioForSelectedCard = mediaPlayerState,
+                        selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+                    ) { viewModel2.increaseLevel() }
+                    j++
+                } else {
+                    Hole(
+                        position = hole,
+                        cardVisible = false,
+                        playAudioForSelectedCard = mediaPlayerState,
+                        selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
+                    ) { viewModel2.increaseLevel() }
+                    k++
+                }
+            }
+           MediaPlayerComponent(context, targetVocabularyItem, true)
+ */
 @Composable
 fun Hole(
     position: Offset,
