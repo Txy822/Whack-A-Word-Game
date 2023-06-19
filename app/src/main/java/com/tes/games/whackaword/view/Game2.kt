@@ -94,7 +94,7 @@ fun GameScreen2() {
 //                        delay(10000L) // Delay for 1 second
 //                    }
                     a = Hole(hole, visible = true, R.drawable.tick) {}
-                    MediaPlayerComponent(context, selectedList[cardCounter - 1], true)
+                    MediaPlayerComponent(context, VocabularyItem("",0, R.raw.correct), true)
 
 
                 } else {
