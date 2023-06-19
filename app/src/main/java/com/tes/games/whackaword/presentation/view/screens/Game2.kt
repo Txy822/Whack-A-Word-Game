@@ -69,24 +69,29 @@ fun GameScreen2() {
             .fillMaxSize()
             .background(Color(0xFFCCBA85)) // Green ground color
     ) {
-        val numbers = listOf(1, 2, 3, 4, 5)
+        val numbers = listOf(0, 1, 2, 3, 4)
         val randomNumbers = numbers.shuffled().take(3)
-        var  i  =1;
-        var cardVisible=true
-        for (hole in holes) {
-            if(randomNumbers.contains(i)){
-                cardVisible =true
-                Hole(position = hole, cardVisible = cardVisible, playAudioForSelectedCard= mediaPlayerState, selectedVocabularyItems[i-1]?.image ?: R.drawable.ic_launcher_background) {viewModel2.increaseLevel()}
+        val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
+        var j = 0
+        var k =0
+        for ((i, hole) in holes.withIndex()) {
+            if (randomNumbers.contains(i)) {
+                Hole(
+                    position = hole,
+                    cardVisible = true,
+                    playAudioForSelectedCard = mediaPlayerState,
+                    selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+                ) { viewModel2.increaseLevel() }
+                j++
+            } else {
+                Hole(
+                    position = hole,
+                    cardVisible = false,
+                    playAudioForSelectedCard = mediaPlayerState,
+                    selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
+                ) { viewModel2.increaseLevel() }
+                k++
             }
-            else {
-                cardVisible =false
-                Hole(position = hole, cardVisible = cardVisible, playAudioForSelectedCard= mediaPlayerState, selectedVocabularyItems[cardCounter - 1]?.image ?: R.drawable.ic_launcher_background) {viewModel2.increaseLevel()}
-            }
-
-            //Hole(hole, visible = false, selectedVocabularyItems[cardCounter - 1]?.image ?:  R.drawable.ic_launcher_background) {}
-           // viewModel2.mediaPlayerState
-            cardCounter--
-            i++
         }
         println("level: $level")
         MediaPlayerComponent(context, targetVocabularyItem, true)
@@ -95,7 +100,13 @@ fun GameScreen2() {
 }
 
 @Composable
-fun Hole(position: Offset, cardVisible: Boolean, playAudioForSelectedCard:Boolean, img: Int, clicked: () -> Unit) {
+fun Hole(
+    position: Offset,
+    cardVisible: Boolean,
+    playAudioForSelectedCard: Boolean,
+    img: Int,
+    clicked: () -> Unit
+) {
     val holeSize = 200.dp
 
 //    OvalWithBorder()
@@ -150,7 +161,7 @@ fun generateRandomHoles(count: Int): List<Offset> {
 
     // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
-    holes.add(Offset(randomX.value + (800), randomY.value-100))
+    holes.add(Offset(randomX.value + (800), randomY.value - 100))
 
 //    }
 
@@ -165,9 +176,10 @@ fun ImageCard(position: Offset, holeSize: Dp, img: Int, clicked: () -> Unit) {
             .size(holeSize, holeSize + 100.dp)
             .padding(16.dp)
             .offset(position.x.dp + 110.dp, position.y.dp - 110.dp)
-            .clickable { clicked()
+            .clickable {
+                clicked()
                 //viewModel.increaseLevel()
-                       },
+            },
 
         colors = CardDefaults.cardColors(colorResource(id = R.color.light_ray)),
         elevation = CardDefaults.cardElevation(1.dp),
