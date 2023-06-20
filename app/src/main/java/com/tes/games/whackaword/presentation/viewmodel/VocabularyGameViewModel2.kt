@@ -27,6 +27,7 @@ class VocabularyGameViewModel2 @Inject constructor(
 
     private val random = Random()
     private val holes = MutableLiveData<List<VocabularyItem>>(listOf())
+
     //var level = 1
     private val _level: MutableStateFlow<Int> = MutableStateFlow(1)
     val level: StateFlow<Int> = _level
@@ -74,7 +75,7 @@ class VocabularyGameViewModel2 @Inject constructor(
     private var timerCounter = 0
 
     init {
-      //  playMediaVocabulary(context= context)
+        //  playMediaVocabulary(context= context)
 
 //        getList()
 //        getSelectedVocabularyItems(3)
@@ -82,7 +83,7 @@ class VocabularyGameViewModel2 @Inject constructor(
 //        playMediaVocabulary(context= context)
 //        _startGame.value =true
         startGame2()
-       // resetGame2()
+        // resetGame2()
     }
 
     private fun getList() {
@@ -119,30 +120,33 @@ class VocabularyGameViewModel2 @Inject constructor(
         )
 
         mediaPlayer.start()
-        _mediaPlayerState.value =true
+        _mediaPlayerState.value = true
         viewModelScope.launch(Dispatchers.IO) {
             delay(2000) // Delay for 1 second
         }
         mediaPlayer.start()
-        _mediaPlayerState.value =true
+        _mediaPlayerState.value = true
         mediaPlayer.release()
         assetFileDescriptor.close()
     }
-     fun increaseLevel() {
-        _level.value = _level.value+1
-     }
-     fun decreaseLevel() {
-        _level.value = _level.value-1
+
+    fun increaseLevel() {
+        _level.value = _level.value + 1
     }
 
-    fun startGame2(){
+    fun decreaseLevel() {
+        _level.value = _level.value - 1
+    }
+
+    fun startGame2() {
         getList()
         getSelectedVocabularyItems(3)
         getTargetVocabularyItem()
-        playMediaVocabulary(context= context)
+        playMediaVocabulary(context = context)
         _startGame.value = true
     }
-    fun resetGame2(){
+
+    fun resetGame2() {
         startGame2()
         // Reset game state and result
         _gameState.value = GameState.Playing
@@ -156,11 +160,12 @@ class VocabularyGameViewModel2 @Inject constructor(
                 delay(1000)
                 timerCounter++
                 _timerValue.value = timerCounter
-                _resetGame.value =true
+                _resetGame.value = true
             }
-           onTimerFinish()
+            onTimerFinish()
         }
     }
+
     fun startGame() {
         // Reset game state and result
         _gameState.value = GameState.Playing
@@ -174,7 +179,7 @@ class VocabularyGameViewModel2 @Inject constructor(
                 delay(1000)
                 timerCounter++
                 _timerValue.value = timerCounter
-                _resetGame.value =true
+                _resetGame.value = true
             }
             onTimerFinish()
         }
@@ -184,17 +189,19 @@ class VocabularyGameViewModel2 @Inject constructor(
     }
 
     private fun onTimerFinish() {
-       startGame2()
+        startGame2()
 //        if (_gameState.value == GameState.Playing) {
 //            retreatVocabularyItems()
 //            _gameState.value = GameState.Failure
 //            _gameResult.value = GameResult.Lose
 //        }
     }
+
     fun resetGame() {
         timerJob?.cancel()
         _gameResult.value = null
     }
+
     private fun retreatVocabularyItems() {
         getSelectedVocabularyItems(3)
         /*

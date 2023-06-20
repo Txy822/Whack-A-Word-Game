@@ -1,5 +1,6 @@
 package com.tes.games.whackaword.presentation.view.screens
 
+import android.content.Context
 import android.os.Handler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -17,8 +18,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,15 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tes.games.whackaword.R
+import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.presentation.view.components.MediaPlayerComponent
 import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
 import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel2
+import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 @Composable
 fun GameScreen2() {
     val context = LocalContext.current
     val holes = remember { generateRandomHoles(9) }
+    val holes2 = remember { mutableStateListOf<Hole>() }
     var clicked = remember { false }
     val viewModel: VocabularyGameViewModel = viewModel()
     val viewModel2: VocabularyGameViewModel2 = viewModel()
@@ -64,7 +70,7 @@ fun GameScreen2() {
     val handler = Handler()
 
 
-    if(resetGame|| startGame){
+    if (resetGame || startGame) {
         var cardCounter = 3
         Box(
             modifier = Modifier
@@ -72,57 +78,57 @@ fun GameScreen2() {
                 .fillMaxSize()
                 .background(Color(0xFFCCBA85)) // Green ground color
         ) {
-            val numbers = listOf(0, 1, 2, 3, 4)
-            val randomNumbers = numbers.shuffled().take(3)
-            val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
-            var j = 0
-            var k =0
-            for ((i, hole) in holes.withIndex()) {
-                if (randomNumbers.contains(i)) {
-                    Hole(
-                        position = hole,
-                        cardVisible = true,
-                        playAudioForSelectedCard = mediaPlayerState,
-                        selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
-                    ) { viewModel2.increaseLevel() }
-                    j++
-                } else {
-                    Hole(
-                        position = hole,
-                        cardVisible = false,
-                        playAudioForSelectedCard = mediaPlayerState,
-                        selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
-                    ) { viewModel2.increaseLevel() }
-                    k++
+
+
+            LaunchedEffect(Unit) {
+                while (true) {
+                    // Create new holes
+                    createHoles(holes,mediaPlayerState, selectedVocabularyItems, viewModel2, context, targetVocabularyItem )
+
+                    // Wait for 10 seconds
+                    delay(10000)
                 }
-                MediaPlayerComponent(context, targetVocabularyItem, true)
             }
         }
     }
 }
 
-/*
-            for ((i, hole) in holes.withIndex()) {
-                if (randomNumbers.contains(i)) {
-                    Hole(
-                        position = hole,
-                        cardVisible = true,
-                        playAudioForSelectedCard = mediaPlayerState,
-                        selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
-                    ) { viewModel2.increaseLevel() }
-                    j++
-                } else {
-                    Hole(
-                        position = hole,
-                        cardVisible = false,
-                        playAudioForSelectedCard = mediaPlayerState,
-                        selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
-                    ) { viewModel2.increaseLevel() }
-                    k++
-                }
-            }
-           MediaPlayerComponent(context, targetVocabularyItem, true)
- */
+@Composable
+fun createHoles(
+    holes: List<Offset>,
+    mediaPlayerState: Boolean,
+    selectedVocabularyItems: List<VocabularyItem?>,
+    viewModel2: VocabularyGameViewModel2,
+    context: Context,
+    targetVocabularyItem: VocabularyItem?
+) {
+    val numbers = listOf(0, 1, 2, 3, 4)
+    val randomNumbers = numbers.shuffled().take(3)
+    val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
+    var j = 0
+    var k = 0
+    for ((i, hole) in holes.withIndex()) {
+        if (randomNumbers.contains(i)) {
+            Hole(
+                position = hole,
+                cardVisible = true,
+                playAudioForSelectedCard = mediaPlayerState,
+                selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+            ) { viewModel2.increaseLevel() }
+            j++
+        } else {
+            Hole(
+                position = hole,
+                cardVisible = false,
+                playAudioForSelectedCard = mediaPlayerState,
+                selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
+            ) { viewModel2.increaseLevel() }
+            k++
+        }
+        MediaPlayerComponent(context, targetVocabularyItem, true)
+    }
+}
+
 @Composable
 fun Hole(
     position: Offset,
