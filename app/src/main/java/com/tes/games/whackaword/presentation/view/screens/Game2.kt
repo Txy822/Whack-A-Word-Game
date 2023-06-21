@@ -313,25 +313,19 @@ fun ImageCard(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (targetClicked.value) {
-                Image(
-                    painter = painterResource(id = R.drawable.tick),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = colorResource(id = R.color.light_ray))
-                )
+            val currentImageId  = if (targetClicked.value) {
+                R.drawable.tick
             } else {
+                img
+            }
                 Image(
-                    painter = painterResource(id = img),
+                    painter = painterResource(id = currentImageId),
                     contentDescription = null,
                     modifier = Modifier
                         .size(200.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(color = colorResource(id = R.color.light_ray))
                 )
-            }
         }
     }
 }
