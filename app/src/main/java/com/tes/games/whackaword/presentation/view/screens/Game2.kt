@@ -17,8 +17,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +37,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tes.games.whackaword.R
@@ -54,6 +58,7 @@ fun GameScreen2() {
     //val holes2 = remember { mutableStateListOf<Hole>() }
     val createHolesState = remember { mutableStateOf(false) }
     val createEmptyHolesState = remember { mutableStateOf(false) }
+    val restartGame = remember { mutableStateOf(false) }
     val viewModel3: VocabularyGameViewModel3 = viewModel()
     val viewModel: VocabularyGameViewModel = viewModel()
     val vocabularyItems by viewModel.vocabularyItems.collectAsState()
@@ -71,9 +76,46 @@ fun GameScreen2() {
     val handler = Handler()
 
 
-    if (resetGame || startGame) {
-        println("start:$startGame and $resetGame")
-        var cardCounter = 3
+
+    println("start:$startGame and $resetGame")
+    var cardCounter = 3
+    createBox(
+        holes,
+        resetGame,
+        mediaPlayerState,
+        selectedVocabularyItems,
+        viewModel,
+        context,
+        targetVocabularyItem,
+        createEmptyHolesState,
+        createHolesState,
+    ) {
+        viewModel.restartGame()
+    }
+}
+
+@Composable
+fun createBox(
+    holes: List<Offset>,
+    resetGame: Boolean,
+    mediaPlayerState: Boolean,
+    selectedVocabularyItems: List<VocabularyItem?>,
+    viewModel: VocabularyGameViewModel,
+    context: Context,
+    targetVocabularyItem: VocabularyItem?,
+    createEmptyHolesState: MutableState<Boolean>,
+    createHolesState: MutableState<Boolean>,
+    restartGame: () -> Unit
+) {
+
+    println(" resetGame state before: $resetGame")
+
+
+
+    println(" resetGame state after : $resetGame")
+    println(" resetGame selected list: ${selectedVocabularyItems.size}")
+
+    if (selectedVocabularyItems.isNotEmpty()) {
         Box(
             modifier = Modifier
                 .padding(top = 200.dp)
@@ -85,14 +127,14 @@ fun GameScreen2() {
             LaunchedEffect(Unit) {
                 while (true) {
                     // Create new holes
-                    createEmptyHolesState.value= true
+                    createEmptyHolesState.value = true
                     delay(2000)
-
+                    restartGame()
                     createHolesState.value = true
                     // createHoles(holes,mediaPlayerState, selectedVocabularyItems, viewModel2, context, targetVocabularyItem )
 
                     // Wait for 10 seconds
-                    delay(10000)
+                    delay(4000)
                     createHolesState.value = false
 
                 }
@@ -110,25 +152,33 @@ fun GameScreen2() {
             if (createEmptyHolesState.value) {
                 createEmptyHoles(
                     holes,
-                    mediaPlayerState,
-                    selectedVocabularyItems,
-                    viewModel,
-                    context,
-                    targetVocabularyItem
                 )
             }
+        }
+    } else {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFCCBA85)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Game Doest Started! " +
+                        "Try again later",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = Color.Black
+
+            )
         }
     }
 }
 
+
 @Composable
 fun createEmptyHoles(
     holes: List<Offset>,
-    mediaPlayerState: Boolean,
-    selectedVocabularyItems: List<VocabularyItem?>,
-    viewModel: VocabularyGameViewModel,
-    context: Context,
-    targetVocabularyItem: VocabularyItem?
 ) {
     for (hole in holes) {
         Hole(
@@ -141,7 +191,6 @@ fun createEmptyHoles(
 }
 
 
-
 @Composable
 fun createHoles(
     holes: List<Offset>,
@@ -152,30 +201,30 @@ fun createHoles(
     targetVocabularyItem: VocabularyItem?
 ) {
     val numbers = listOf(0, 1, 2, 3, 4)
-
-    val randomNumbers = numbers.shuffled().take(3)
-    val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
+    val randomNumbers = numbers.shuffled().take(3)////0,1,3
+    println(" random selected" + randomNumbers[0] + " " + randomNumbers[1] + " " + randomNumbers[2])
+    // val restOfNumbers = numbers - randomNumbers.toSet()
     var j = 0
-    var k = 0
-    for ((i, hole) in holes.withIndex()) {
-        if (randomNumbers.contains(i)) {
-            Hole(
-                position = hole,
-                cardVisible = true,
-                playAudioForSelectedCard = mediaPlayerState,
-                img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
-            ) { viewModel.increaseLevel() }
-            j++
-        } else {
-            Hole(
-                position = hole,
-                cardVisible = false,
-                playAudioForSelectedCard = mediaPlayerState,
-                img = selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
-            ) { viewModel.increaseLevel() }
-            k++
+    if (selectedVocabularyItems.isNotEmpty()) {
+        for ((i, hole) in holes.withIndex()) {
+            if (randomNumbers.contains(i)) {
+                Hole(
+                    position = hole,
+                    cardVisible = true,
+                    playAudioForSelectedCard = mediaPlayerState,
+                    img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+                ) { viewModel.increaseLevel() }
+                j++
+            } else {
+                Hole(
+                    position = hole,
+                    cardVisible = false,
+                    playAudioForSelectedCard = false,
+                    img = 0
+                ) { }
+            }
+            MediaPlayerComponent(context, targetVocabularyItem, true)
         }
-        MediaPlayerComponent(context, targetVocabularyItem, true)
     }
 }
 

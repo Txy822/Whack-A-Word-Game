@@ -138,12 +138,12 @@ class VocabularyGameViewModel @Inject constructor(
         _level.value = _level.value - 1
     }
 
-    fun startGame2() {
-        getList()
-        getSelectedVocabularyItems(3)
-        getTargetVocabularyItem()
-        playMediaVocabulary(context = context)
-        _startGame.value = true
+    private fun startGame2() {
+        //  _startGame.value = true
+            getList()
+            getSelectedVocabularyItems(3)
+            getTargetVocabularyItem()
+            playMediaVocabulary(context = context)
     }
 
     fun resetGame2() {
@@ -213,6 +213,13 @@ class VocabularyGameViewModel @Inject constructor(
         holes.value = updatedHoles
 
         */
+    }
+
+    fun restartGame() {
+        _resetGame.value = true
+        getList()
+        getSelectedVocabularyItems(3)
+        getTargetVocabularyItem()
     }
 
 
