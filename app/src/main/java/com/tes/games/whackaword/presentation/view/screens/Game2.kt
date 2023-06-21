@@ -56,6 +56,8 @@ fun GameScreen2() {
     val context = LocalContext.current
     val holes = remember { generateRandomHoles(9) }
     //val holes2 = remember { mutableStateListOf<Hole>() }
+    val targetClicked = remember { mutableStateOf(false) }
+
     val createHolesState = remember { mutableStateOf(false) }
     val createEmptyHolesState = remember { mutableStateOf(false) }
     val restartGame = remember { mutableStateOf(false) }
@@ -75,13 +77,18 @@ fun GameScreen2() {
 
     val handler = Handler()
 
+    println("Selected  size ${selectedVocabularyItems.size} ")
+
+    for(i in selectedVocabularyItems.indices){
+        println("Selected $i: ${selectedVocabularyItems[i]!!.image} ")
+    }
+    println("Selected Target: ${targetVocabularyItem!!.image} ")
 
 
-    println("start:$startGame and $resetGame")
+    println("Level: $level")
     var cardCounter = 3
     createBox(
         holes,
-        resetGame,
         mediaPlayerState,
         selectedVocabularyItems,
         viewModel,
@@ -97,7 +104,6 @@ fun GameScreen2() {
 @Composable
 fun createBox(
     holes: List<Offset>,
-    resetGame: Boolean,
     mediaPlayerState: Boolean,
     selectedVocabularyItems: List<VocabularyItem?>,
     viewModel: VocabularyGameViewModel,
@@ -107,14 +113,6 @@ fun createBox(
     createHolesState: MutableState<Boolean>,
     restartGame: () -> Unit
 ) {
-
-    println(" resetGame state before: $resetGame")
-
-
-
-    println(" resetGame state after : $resetGame")
-    println(" resetGame selected list: ${selectedVocabularyItems.size}")
-
     if (selectedVocabularyItems.isNotEmpty()) {
         Box(
             modifier = Modifier
@@ -131,9 +129,7 @@ fun createBox(
                     delay(2000)
                     restartGame()
                     createHolesState.value = true
-                    // createHoles(holes,mediaPlayerState, selectedVocabularyItems, viewModel2, context, targetVocabularyItem )
-
-                    // Wait for 10 seconds
+                    // Wait for 4 seconds
                     delay(4000)
                     createHolesState.value = false
 
@@ -183,8 +179,8 @@ fun createEmptyHoles(
     for (hole in holes) {
         Hole(
             position = hole,
+            isTargetHole = false,
             cardVisible = false,
-            playAudioForSelectedCard = false,
             img = 0
         ) { }
     }
@@ -200,31 +196,41 @@ fun createHoles(
     context: Context,
     targetVocabularyItem: VocabularyItem?
 ) {
-    val numbers = listOf(0, 1, 2, 3, 4)
-    val randomNumbers = numbers.shuffled().take(3)////0,1,3
-    println(" random selected" + randomNumbers[0] + " " + randomNumbers[1] + " " + randomNumbers[2])
-    // val restOfNumbers = numbers - randomNumbers.toSet()
+
+    val numberOfHoles = listOf(0, 1, 2, 3, 4)
+    val randomSelectedNumberOfHoles = numberOfHoles.shuffled().take(selectedVocabularyItems.size)////1,4,3
     var j = 0
-    if (selectedVocabularyItems.isNotEmpty()) {
-        for ((i, hole) in holes.withIndex()) {
-            if (randomNumbers.contains(i)) {
+    for ((i, hole) in holes.withIndex()) {
+        if (randomSelectedNumberOfHoles.contains(i)) {
+            if (selectedVocabularyItems[j] == targetVocabularyItem) {
                 Hole(
                     position = hole,
+                    isTargetHole = true,
                     cardVisible = true,
-                    playAudioForSelectedCard = mediaPlayerState,
                     img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
-                ) { viewModel.increaseLevel() }
-                j++
+                ) {
+                    viewModel.increaseLevel()
+                }
             } else {
                 Hole(
                     position = hole,
-                    cardVisible = false,
-                    playAudioForSelectedCard = false,
-                    img = 0
-                ) { }
+                    isTargetHole = false,
+                    cardVisible = true,
+                    img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+                ) {
+                    viewModel.increaseLevel()
+                }
             }
-            MediaPlayerComponent(context, targetVocabularyItem, true)
+            j++
+        } else {
+            Hole(
+                position = hole,
+                isTargetHole = false,
+                cardVisible = false,
+                img = 0
+            ) { }
         }
+        MediaPlayerComponent(context, targetVocabularyItem)
     }
 }
 
@@ -232,12 +238,11 @@ fun createHoles(
 fun Hole(
     position: Offset,
     cardVisible: Boolean,
-    playAudioForSelectedCard: Boolean,
+    isTargetHole: Boolean,
     img: Int,
     clicked: () -> Unit
 ) {
     val holeSize = 200.dp
-
 //    OvalWithBorder()
     Canvas(
         modifier = Modifier
@@ -254,17 +259,84 @@ fun Hole(
         )
     }
     if (cardVisible) {
-        ImageCard(position = position, holeSize = holeSize, img, clicked = clicked)
+        ImageCard(
+            position = position,
+            holeSize = holeSize,
+            isTargetHole = isTargetHole,
+            img,
+            clicked = clicked
+        )
     }
-    /*
-    Image(
-        painter = painterResource(id = R.drawable.fc_apple),
-        contentDescription = null,
+}
+
+@Composable
+fun ImageCard(
+    position: Offset,
+    holeSize: Dp,
+    isTargetHole: Boolean,
+    img: Int,
+    clicked: () -> Unit
+) {
+    val targetClicked = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    Card(
         modifier = Modifier
-            .size(holeSize)
-            .offset(position.x.dp + 100.dp, position.y.dp - 10.dp)
-    )
-*/
+            .size(holeSize, holeSize + 100.dp)
+            .padding(16.dp)
+            .offset(position.x.dp + 110.dp, position.y.dp - 110.dp)
+            .clickable {
+                if (isTargetHole) {
+                    clicked()
+                    targetClicked.value = true
+                }
+            },
+
+        colors = CardDefaults.cardColors(colorResource(id = R.color.light_ray)),
+        elevation = CardDefaults.cardElevation(1.dp),
+//        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.medium.copy(
+            topStart = CornerSize(16.dp),
+            topEnd = CornerSize(16.dp),
+            bottomStart = CornerSize(5.dp),
+            bottomEnd = CornerSize(5.dp)
+        ),
+        border = BorderStroke(
+            width = 6.dp,
+            color = Color.Black,
+        ),
+    ) {
+        if (targetClicked.value) {
+            val targetVocabularyItem = VocabularyItem("", 0, R.raw.correct)
+            MediaPlayerComponent(context, targetVocabularyItem)
+        }
+
+        Box(
+            modifier = Modifier
+                .padding(2.dp)
+                .fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            if (targetClicked.value) {
+                Image(
+                    painter = painterResource(id = R.drawable.tick),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(color = colorResource(id = R.color.light_ray))
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = img),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(color = colorResource(id = R.color.light_ray))
+                )
+            }
+        }
+    }
 }
 
 fun generateRandomHoles(count: Int): List<Offset> {
@@ -293,51 +365,6 @@ fun generateRandomHoles(count: Int): List<Offset> {
     holes.add(Offset(randomX.value + (800), randomY.value - 100))
 
 //    }
-
-
     return holes
 }
 
-@Composable
-fun ImageCard(position: Offset, holeSize: Dp, img: Int, clicked: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .size(holeSize, holeSize + 100.dp)
-            .padding(16.dp)
-            .offset(position.x.dp + 110.dp, position.y.dp - 110.dp)
-            .clickable {
-                clicked()
-                //viewModel.increaseLevel()
-            },
-
-        colors = CardDefaults.cardColors(colorResource(id = R.color.light_ray)),
-        elevation = CardDefaults.cardElevation(1.dp),
-//        shape = RoundedCornerShape(16.dp),
-        shape = MaterialTheme.shapes.medium.copy(
-            topStart = CornerSize(16.dp),
-            topEnd = CornerSize(16.dp),
-            bottomStart = CornerSize(5.dp),
-            bottomEnd = CornerSize(5.dp)
-        ),
-        border = BorderStroke(
-            width = 6.dp,
-            color = Color.Black,
-        ),
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(2.dp)
-                .fillMaxSize(),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Image(
-                painter = painterResource(id = img),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(color = colorResource(id = R.color.light_ray))
-            )
-        }
-    }
-}

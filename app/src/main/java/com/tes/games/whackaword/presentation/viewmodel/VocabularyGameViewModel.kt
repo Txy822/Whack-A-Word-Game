@@ -29,7 +29,7 @@ class VocabularyGameViewModel @Inject constructor(
     private val holes = MutableLiveData<List<VocabularyItem>>(listOf())
 
     //var level = 1
-    private val _level: MutableStateFlow<Int> = MutableStateFlow(1)
+    private val _level: MutableStateFlow<Int> = MutableStateFlow(0)
     val level: StateFlow<Int> = _level
 
     private var successCount = 0
@@ -140,10 +140,10 @@ class VocabularyGameViewModel @Inject constructor(
 
     private fun startGame2() {
         //  _startGame.value = true
-            getList()
-            getSelectedVocabularyItems(3)
-            getTargetVocabularyItem()
-            playMediaVocabulary(context = context)
+        getList()
+        getSelectedVocabularyItems(levelConverter(_level.value))
+        getTargetVocabularyItem()
+        playMediaVocabulary(context = context)
     }
 
     fun resetGame2() {
@@ -202,8 +202,19 @@ class VocabularyGameViewModel @Inject constructor(
         _gameResult.value = null
     }
 
+    private fun levelConverter(level: Int): Int {
+        return if (level < 3) {
+            1
+        } else if (level < 6) {
+            2
+        } else {
+            3
+        }
+    }
+
     private fun retreatVocabularyItems() {
-        getSelectedVocabularyItems(3)
+
+        getSelectedVocabularyItems(levelConverter(_level.value))
         /*
         // Retreat all the vocabulary items into their holes
         val currentHoles = holes.value ?: return
@@ -218,7 +229,7 @@ class VocabularyGameViewModel @Inject constructor(
     fun restartGame() {
         _resetGame.value = true
         getList()
-        getSelectedVocabularyItems(3)
+        getSelectedVocabularyItems(levelConverter(_level.value))
         getTargetVocabularyItem()
     }
 
