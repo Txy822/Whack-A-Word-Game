@@ -18,8 +18,8 @@ fun MediaPlayerComponent(
     val mediaPlayer = remember { MediaPlayer() }
     val coroutineScope = rememberCoroutineScope()
 
-
     DisposableEffect(Unit) {
+
         val assetFileDescriptor =
             context.resources.openRawResourceFd(selectedVocabularyItem?.audio!!)
 
@@ -29,9 +29,13 @@ fun MediaPlayerComponent(
             assetFileDescriptor.length
         )
         mediaPlayer.prepare()
-        mediaPlayer.start()
-        coroutineScope.launch {
-            delay(2000) // Delay for 1 second
+        if (selectedVocabularyItem.image != 0) {
+            mediaPlayer.start()
+            coroutineScope.launch {
+                delay(2000) // Delay for 1 second
+                mediaPlayer.start()
+            }
+        } else {
             mediaPlayer.start()
         }
         onDispose {

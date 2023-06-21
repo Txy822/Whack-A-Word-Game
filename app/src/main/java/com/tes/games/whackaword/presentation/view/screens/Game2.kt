@@ -47,7 +47,6 @@ import com.tes.games.whackaword.R
 import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.presentation.view.components.MediaPlayerComponent
 import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
-import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel3
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -61,7 +60,7 @@ fun GameScreen2() {
     val createHolesState = remember { mutableStateOf(false) }
     val createEmptyHolesState = remember { mutableStateOf(false) }
     val restartGame = remember { mutableStateOf(false) }
-    val viewModel3: VocabularyGameViewModel3 = viewModel()
+   // val viewModel3: VocabularyGameViewModel3 = viewModel()
     val viewModel: VocabularyGameViewModel = viewModel()
     val vocabularyItems by viewModel.vocabularyItems.collectAsState()
     val selectedVocabularyItems by viewModel.selectedVocabularyItems.collectAsState()
@@ -71,7 +70,7 @@ fun GameScreen2() {
     val resetGame by viewModel.resetGame.collectAsState()
     val startGame by viewModel.startGame.collectAsState()
     //val selectedItems: List<VocabularyItem> = viewModel2.getSelectedVocabularyItems()
-    val vocabularyItems2 = viewModel3.vocabularyItems
+    //val vocabularyItems2 = viewModel3.vocabularyItems
     //val vocabularyItems = viewModel2.getList()
     val coroutineScope = rememberCoroutineScope()
 
@@ -138,7 +137,6 @@ fun createBox(
             if (createHolesState.value) {
                 createHoles(
                     holes,
-                    mediaPlayerState,
                     selectedVocabularyItems,
                     viewModel,
                     context,
@@ -190,7 +188,6 @@ fun createEmptyHoles(
 @Composable
 fun createHoles(
     holes: List<Offset>,
-    mediaPlayerState: Boolean,
     selectedVocabularyItems: List<VocabularyItem?>,
     viewModel: VocabularyGameViewModel,
     context: Context,
