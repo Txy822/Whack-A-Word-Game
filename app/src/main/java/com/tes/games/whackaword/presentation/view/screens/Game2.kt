@@ -1,7 +1,6 @@
 package com.tes.games.whackaword.presentation.view.screens
 
 import android.content.Context
-import android.os.Handler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -25,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,42 +51,15 @@ import kotlin.random.Random
 @Composable
 fun GameScreen2() {
     val context = LocalContext.current
-    val holes = remember { generateRandomHoles(9) }
-    //val holes2 = remember { mutableStateListOf<Hole>() }
-    val targetClicked = remember { mutableStateOf(false) }
-
+    val holes = remember { generateRandomHoles(5) }
     val createHolesState = remember { mutableStateOf(false) }
     val createEmptyHolesState = remember { mutableStateOf(false) }
-    val restartGame = remember { mutableStateOf(false) }
-   // val viewModel3: VocabularyGameViewModel3 = viewModel()
     val viewModel: VocabularyGameViewModel = viewModel()
-    val vocabularyItems by viewModel.vocabularyItems.collectAsState()
     val selectedVocabularyItems by viewModel.selectedVocabularyItems.collectAsState()
     val targetVocabularyItem by viewModel.targetVocabularyItem.collectAsState()
-    val mediaPlayerState by viewModel.mediaPlayerState.collectAsState()
-    val level by viewModel.level.collectAsState()
-    val resetGame by viewModel.resetGame.collectAsState()
-    val startGame by viewModel.startGame.collectAsState()
-    //val selectedItems: List<VocabularyItem> = viewModel2.getSelectedVocabularyItems()
-    //val vocabularyItems2 = viewModel3.vocabularyItems
-    //val vocabularyItems = viewModel2.getList()
-    val coroutineScope = rememberCoroutineScope()
 
-    val handler = Handler()
-
-    println("Selected  size ${selectedVocabularyItems.size} ")
-
-    for(i in selectedVocabularyItems.indices){
-        println("Selected $i: ${selectedVocabularyItems[i]!!.image} ")
-    }
-    println("Selected Target: ${targetVocabularyItem!!.image} ")
-
-
-    println("Level: $level")
-    var cardCounter = 3
     createBox(
         holes,
-        mediaPlayerState,
         selectedVocabularyItems,
         viewModel,
         context,
@@ -103,7 +74,6 @@ fun GameScreen2() {
 @Composable
 fun createBox(
     holes: List<Offset>,
-    mediaPlayerState: Boolean,
     selectedVocabularyItems: List<VocabularyItem?>,
     viewModel: VocabularyGameViewModel,
     context: Context,
@@ -120,7 +90,6 @@ fun createBox(
                 .background(Color(0xFFCCBA85)) // Green ground color
         ) {
 
-
             LaunchedEffect(Unit) {
                 while (true) {
                     // Create new holes
@@ -131,7 +100,6 @@ fun createBox(
                     // Wait for 4 seconds
                     delay(4000)
                     createHolesState.value = false
-
                 }
             }
             if (createHolesState.value) {
@@ -150,7 +118,6 @@ fun createBox(
             }
         }
     } else {
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -163,7 +130,6 @@ fun createBox(
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 color = Color.Black
-
             )
         }
     }
@@ -330,9 +296,8 @@ fun ImageCard(
     }
 }
 
-fun generateRandomHoles(count: Int): List<Offset> {
+fun generateRandomHoles(count: Int): List<Offset> { // representing of point in cartesian space
     val holes = mutableListOf<Offset>()
-    val secondOffset = 0
 //    repeat(count) {
     val randomX = Random.nextFloat() * 200.dp
     var randomY = Random.nextFloat() * 200.dp
@@ -346,7 +311,6 @@ fun generateRandomHoles(count: Int): List<Offset> {
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (400), randomY.value + 200))
 
-
     // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (600), randomY.value))
@@ -354,8 +318,7 @@ fun generateRandomHoles(count: Int): List<Offset> {
     // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (800), randomY.value - 100))
-
-//    }
     return holes
 }
+
 
