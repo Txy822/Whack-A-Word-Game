@@ -10,12 +10,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tes.games.whackaword.R
 import com.tes.games.whackaword.domain.model.VocabularyItem
-import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
+import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel3
 import com.tes.games.whackaword.util.Screen
 
 @Composable
 fun VocabularyGameApp() {
-    val viewModel: VocabularyGameViewModel = viewModel()
+    val viewModel: VocabularyGameViewModel3 = viewModel()
 
 
     // Track the current game screen

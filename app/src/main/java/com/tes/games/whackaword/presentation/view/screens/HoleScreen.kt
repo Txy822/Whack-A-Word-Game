@@ -50,7 +50,7 @@ fun HoleCard(modifier: Modifier = Modifier) {
     ){}
 }
 
-data class Hole(val x: Dp, val y: Dp)
+data class Hole2(val x: Dp, val y: Dp)
 
 fun generateRandomHoles(
     holeCount: Int,
@@ -58,8 +58,8 @@ fun generateRandomHoles(
     minVerticalDistance: Dp,
     maxWidth: Dp,
     maxHeight: Dp
-): List<Hole> {
-    val holes = mutableListOf<Hole>()
+): List<Hole2> {
+    val holes = mutableListOf<Hole2>()
 //    var prevX = Random.nextInt(0, (maxWidth - minHorizontalDistance).value.toInt()).dp
 
     var prevX = Random.nextInt((maxWidth - minHorizontalDistance).value.toInt() + 1).dp
@@ -72,13 +72,13 @@ fun generateRandomHoles(
 //    var prevY = Random.nextInt(0, (maxHeight - minVerticalDistance+1.dp).value.toInt()).dp
     println("prevY:$prevY")
     println("prevY:${prevY.value.toInt()}")
-    holes.add(Hole(prevX, prevY))
+    holes.add(Hole2(prevX, prevY))
 
     for (i in 1 until holeCount) {
         val newX = Random.nextInt(prevX.value.toInt() + minHorizontalDistance.value.toInt(), (maxWidth - minHorizontalDistance).value.toInt()).dp
         val newY = Random.nextInt(prevY.value.toInt() + minVerticalDistance.value.toInt(), (maxHeight - minVerticalDistance + 1.dp).value.toInt()).dp
 
-        holes.add(Hole(newX, newY))
+        holes.add(Hole2(newX, newY))
 
         prevX = newX
         prevY = newY

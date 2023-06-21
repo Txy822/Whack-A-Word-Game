@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -43,7 +43,7 @@ import com.tes.games.whackaword.R
 import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.presentation.view.components.MediaPlayerComponent
 import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
-import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel2
+import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel3
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -51,19 +51,20 @@ import kotlin.random.Random
 fun GameScreen2() {
     val context = LocalContext.current
     val holes = remember { generateRandomHoles(9) }
-    val holes2 = remember { mutableStateListOf<Hole>() }
-    var clicked = remember { false }
+    //val holes2 = remember { mutableStateListOf<Hole>() }
+    val createHolesState = remember { mutableStateOf(false) }
+    val createEmptyHolesState = remember { mutableStateOf(false) }
+    val viewModel3: VocabularyGameViewModel3 = viewModel()
     val viewModel: VocabularyGameViewModel = viewModel()
-    val viewModel2: VocabularyGameViewModel2 = viewModel()
-    val vocabularyItems by viewModel2.vocabularyItems.collectAsState()
-    val selectedVocabularyItems by viewModel2.selectedVocabularyItems.collectAsState()
-    val targetVocabularyItem by viewModel2.targetVocabularyItem.collectAsState()
-    val mediaPlayerState by viewModel2.mediaPlayerState.collectAsState()
-    val level by viewModel2.level.collectAsState()
-    val resetGame by viewModel2.resetGame.collectAsState()
-    val startGame by viewModel2.startGame.collectAsState()
+    val vocabularyItems by viewModel.vocabularyItems.collectAsState()
+    val selectedVocabularyItems by viewModel.selectedVocabularyItems.collectAsState()
+    val targetVocabularyItem by viewModel.targetVocabularyItem.collectAsState()
+    val mediaPlayerState by viewModel.mediaPlayerState.collectAsState()
+    val level by viewModel.level.collectAsState()
+    val resetGame by viewModel.resetGame.collectAsState()
+    val startGame by viewModel.startGame.collectAsState()
     //val selectedItems: List<VocabularyItem> = viewModel2.getSelectedVocabularyItems()
-    val vocabularyItems2 = viewModel.vocabularyItems
+    val vocabularyItems2 = viewModel3.vocabularyItems
     //val vocabularyItems = viewModel2.getList()
     val coroutineScope = rememberCoroutineScope()
 
@@ -71,6 +72,7 @@ fun GameScreen2() {
 
 
     if (resetGame || startGame) {
+        println("start:$startGame and $resetGame")
         var cardCounter = 3
         Box(
             modifier = Modifier
@@ -83,26 +85,74 @@ fun GameScreen2() {
             LaunchedEffect(Unit) {
                 while (true) {
                     // Create new holes
-                    createHoles(holes,mediaPlayerState, selectedVocabularyItems, viewModel2, context, targetVocabularyItem )
+                    createEmptyHolesState.value= true
+                    delay(2000)
+
+                    createHolesState.value = true
+                    // createHoles(holes,mediaPlayerState, selectedVocabularyItems, viewModel2, context, targetVocabularyItem )
 
                     // Wait for 10 seconds
                     delay(10000)
+                    createHolesState.value = false
+
                 }
+            }
+            if (createHolesState.value) {
+                createHoles(
+                    holes,
+                    mediaPlayerState,
+                    selectedVocabularyItems,
+                    viewModel,
+                    context,
+                    targetVocabularyItem
+                )
+            }
+            if (createEmptyHolesState.value) {
+                createEmptyHoles(
+                    holes,
+                    mediaPlayerState,
+                    selectedVocabularyItems,
+                    viewModel,
+                    context,
+                    targetVocabularyItem
+                )
             }
         }
     }
 }
 
 @Composable
+fun createEmptyHoles(
+    holes: List<Offset>,
+    mediaPlayerState: Boolean,
+    selectedVocabularyItems: List<VocabularyItem?>,
+    viewModel: VocabularyGameViewModel,
+    context: Context,
+    targetVocabularyItem: VocabularyItem?
+) {
+    for (hole in holes) {
+        Hole(
+            position = hole,
+            cardVisible = false,
+            playAudioForSelectedCard = false,
+            img = 0
+        ) { }
+    }
+}
+
+
+
+@Composable
 fun createHoles(
     holes: List<Offset>,
     mediaPlayerState: Boolean,
     selectedVocabularyItems: List<VocabularyItem?>,
-    viewModel2: VocabularyGameViewModel2,
+    viewModel: VocabularyGameViewModel,
     context: Context,
     targetVocabularyItem: VocabularyItem?
 ) {
     val numbers = listOf(0, 1, 2, 3, 4)
+
     val randomNumbers = numbers.shuffled().take(3)
     val restOfNumbers = numbers - randomNumbers.toSet()//0,1,3
     var j = 0
@@ -113,16 +163,16 @@ fun createHoles(
                 position = hole,
                 cardVisible = true,
                 playAudioForSelectedCard = mediaPlayerState,
-                selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
-            ) { viewModel2.increaseLevel() }
+                img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
+            ) { viewModel.increaseLevel() }
             j++
         } else {
             Hole(
                 position = hole,
                 cardVisible = false,
                 playAudioForSelectedCard = mediaPlayerState,
-                selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
-            ) { viewModel2.increaseLevel() }
+                img = selectedVocabularyItems[k]?.image ?: R.drawable.ic_launcher_background
+            ) { viewModel.increaseLevel() }
             k++
         }
         MediaPlayerComponent(context, targetVocabularyItem, true)
