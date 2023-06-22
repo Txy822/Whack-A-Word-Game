@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tes.games.whackaword.R
 import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.domain.repository.VocabularyGameRepository
 import com.tes.games.whackaword.presentation.view.components.GameState
@@ -34,7 +35,7 @@ class VocabularyGameViewModel @Inject constructor(
 
     private var successCount = 0
 
-    private val mediaPlayer = MediaPlayer()
+    var mediaPlayer = MediaPlayer()
 
     private val _mediaPlayerState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val mediaPlayerState: StateFlow<Boolean> = _mediaPlayerState
@@ -54,7 +55,9 @@ class VocabularyGameViewModel @Inject constructor(
         )
     val selectedVocabularyItems: StateFlow<List<VocabularyItem?>> = _selectedVocabularyItems
 
-    private val _targetVocabularyItem: MutableStateFlow<VocabularyItem?> = MutableStateFlow(null)
+    private val _targetVocabularyItem: MutableStateFlow<VocabularyItem?> = MutableStateFlow(
+       null
+    )
     val targetVocabularyItem: StateFlow<VocabularyItem?> = _targetVocabularyItem
 
 
@@ -72,44 +75,82 @@ class VocabularyGameViewModel @Inject constructor(
         _vocabularyItems.value = repository.getVocabularyItems()
     }
 
-    private fun getSelectedVocabularyItems(stage: Int) {
+     fun getSelectedVocabularyItemsAndTarget(stage: Int) {
         val vocabularyItemList = repository.getVocabularyItems()
-        val shuffledVocabularyItems = vocabularyItemList.shuffled()
-        if (stage == 3) {
-            _selectedVocabularyItems.value = shuffledVocabularyItems.take(3)
-        } else if (stage == 2) {
-            _selectedVocabularyItems.value = shuffledVocabularyItems.take(2)
-        } else {
-            _selectedVocabularyItems.value = shuffledVocabularyItems.take(1)
-        }
+         if( vocabularyItemList.isNotEmpty()) {
+             val shuffledVocabularyItems = vocabularyItemList.shuffled()
+             val selectOne = shuffledVocabularyItems.take(1)
+             val targetFromOne = selectOne.first()
+             val selectTwo = shuffledVocabularyItems.take(2)
+             val targetFromTwo = selectTwo.shuffled().first()
+             val selectThree = shuffledVocabularyItems.take(3)
+             val targetFromThree = selectThree.shuffled().first()
+             if (stage == 3) {
+                 _selectedVocabularyItems.value = selectThree
+                 _targetVocabularyItem.value = targetFromThree
+             } else if (stage == 2) {
+                 _selectedVocabularyItems.value = selectTwo
+                 _targetVocabularyItem.value = targetFromTwo
+             } else {
+                 _selectedVocabularyItems.value = selectOne
+                 _targetVocabularyItem.value = targetFromOne
+             }
+         }
     }
 
-    private fun getTargetVocabularyItem() {
-        val vocabularyItemList = _selectedVocabularyItems.value
-        val shuffledVocabularyItems = vocabularyItemList.shuffled()
-        _targetVocabularyItem.value = shuffledVocabularyItems.first()
-    }
+//     fun getTargetVocabularyItem() {
+//        val vocabularyItemList = _selectedVocabularyItems.value
+//        if (vocabularyItemList.isNotEmpty()) {
+//            val shuffledVocabularyItems = vocabularyItemList.shuffled()
+//            _targetVocabularyItem.value = shuffledVocabularyItems.first()
+//        } else {
+//            _targetVocabularyItem.value = null
+//        }
+//    }
 
     private fun playMediaVocabulary(
         context: Context,
-        targetVocabularyItem: VocabularyItem = _targetVocabularyItem.value!!,
+        targetVocabularyItem: VocabularyItem? = _targetVocabularyItem.value,
     ) {
-        val assetFileDescriptor = context.resources.openRawResourceFd(targetVocabularyItem.audio)
-        mediaPlayer.setDataSource(
-            assetFileDescriptor.fileDescriptor,
-            assetFileDescriptor.startOffset,
-            assetFileDescriptor.length
-        )
+        if (targetVocabularyItem != null) {
+            val resources = context.resources ?: return // Check if resources are null
+            val assetFileDescriptor =
+                resources.openRawResourceFd(targetVocabularyItem.audio)
+            mediaPlayer.setDataSource(
+                assetFileDescriptor.fileDescriptor,
+                assetFileDescriptor.startOffset,
+                assetFileDescriptor.length
+            )
 
-        mediaPlayer.start()
-        _mediaPlayerState.value = true
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(2000) // Delay for 2 second
+            mediaPlayer.start()
+            _mediaPlayerState.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                delay(2000) // Delay for 2 second
+            }
+            mediaPlayer.start()
+            _mediaPlayerState.value = true
+            mediaPlayer.release()
+            assetFileDescriptor.close()
+        } else {
+            val resources = context.resources ?: return // Check if resources are null
+            val assetFileDescriptor =
+                resources.openRawResourceFd(VocabularyItem("Apple", R.drawable.fc_apple, R.raw.fc_apple).audio)
+            mediaPlayer.setDataSource(
+                assetFileDescriptor.fileDescriptor,
+                assetFileDescriptor.startOffset,
+                assetFileDescriptor.length
+            )
+
+            mediaPlayer.start()
+            _mediaPlayerState.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                delay(2000) // Delay for 2 second
+            }
+            mediaPlayer.start()
+            _mediaPlayerState.value = true
+            mediaPlayer.release()
+            assetFileDescriptor.close()
         }
-        mediaPlayer.start()
-        _mediaPlayerState.value = true
-        mediaPlayer.release()
-        assetFileDescriptor.close()
     }
 
 
@@ -123,29 +164,28 @@ class VocabularyGameViewModel @Inject constructor(
         _point.value = point.value - 1
     }
 
-    private fun startGame() {
+    fun startGame() {
         getList()
-        getSelectedVocabularyItems(_level.value)
-        getTargetVocabularyItem()
+        getSelectedVocabularyItemsAndTarget(_level.value)
+       // getTargetVocabularyItem()
         playMediaVocabulary(context = context)
     }
 
-    private fun levelConverter(point: Int){
+    private fun levelConverter(point: Int) {
         if (point < 3) {
-           _level.value = 1
-        }
-        else if (point < 6) {
+            _level.value = 1
+        } else if (point < 6) {
             _level.value = 2
         } else {
-            _level.value =  3
+            _level.value = 3
         }
     }
 
     fun restartGame() {
         _resetGame.value = true
-        getList()
-        getSelectedVocabularyItems(_level.value)
-        getTargetVocabularyItem()
+//        getList()
+        getSelectedVocabularyItemsAndTarget(_level.value)
+//        getTargetVocabularyItem()
     }
 
 
