@@ -51,7 +51,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tes.games.whackaword.R
 import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.presentation.view.components.MediaPlayerComponent
@@ -63,17 +65,17 @@ import kotlin.random.Random
 //val   showListingViewModel: SearchShowsViewModel = hiltViewModel()
 @Composable
 fun GameScreen(
-    navController: NavController,
-    viewModel: VocabularyGameViewModel
+    navController: NavController= rememberNavController(),
+    viewModel: VocabularyGameViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenOrientation = configuration.orientation
     val holes = if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-        remember { generateRandomHoles() }
+        remember { generateRandomHolesForLANDSCAPE() }
     }
     else {
-        remember { generateRandomHoles2() }
+        remember { generateRandomHolesForPORTRAIT() }
     }
     val createHolesState = remember { mutableStateOf(false) }
     val createEmptyHolesState = remember { mutableStateOf(false) }
@@ -127,7 +129,7 @@ fun GameScreen(
                 )
                 Spacer(modifier = Modifier.width(300.dp))
                 Button(
-                    modifier = Modifier.height(100.dp).padding(top= 20.dp),
+                    modifier = Modifier.padding(top= 20.dp),
                     onClick = { navController.navigate(Screen.MenuScreen.route) },
                     colors = ButtonDefaults.buttonColors(contentColor = Color.Black, containerColor = Color.Transparent),
                 )
@@ -135,7 +137,6 @@ fun GameScreen(
                 {
                         Text(
                             modifier = Modifier
-                                .padding(top = 20.dp)
                                 .background(Color.Transparent),
                             text = "Exit",
                             fontWeight = FontWeight.Bold,
@@ -147,7 +148,7 @@ fun GameScreen(
             }
 
         }
-        createBox(
+        CreateBox(
             holes,
             selectedVocabularyItems,
             viewModel,
@@ -164,7 +165,7 @@ fun GameScreen(
 }
 
 @Composable
-fun createBox(
+fun CreateBox(
     holes: List<Offset>,
     selectedVocabularyItems: List<VocabularyItem?>,
     viewModel: VocabularyGameViewModel,
@@ -195,7 +196,7 @@ fun createBox(
                 }
             }
             if (createHolesState.value) {
-                createHoles(
+                CreateHoles(
                     holes,
                     selectedVocabularyItems,
                     viewModel,
@@ -204,7 +205,7 @@ fun createBox(
                 )
             }
             if (createEmptyHolesState.value) {
-                createEmptyHoles(
+                CreateEmptyHoles(
                     holes,
                 )
             }
@@ -229,7 +230,7 @@ fun createBox(
 
 
 @Composable
-fun createEmptyHoles(
+fun CreateEmptyHoles(
     holes: List<Offset>,
 ) {
     for (hole in holes) {
@@ -244,7 +245,7 @@ fun createEmptyHoles(
 
 
 @Composable
-fun createHoles(
+fun CreateHoles(
     holes: List<Offset>,
     selectedVocabularyItems: List<VocabularyItem?>,
     viewModel: VocabularyGameViewModel,
@@ -440,59 +441,45 @@ fun ImageCard(
     }
 }
 
-fun generateRandomHoles(): List<Offset> { // representing of point in cartesian space
+fun generateRandomHolesForLANDSCAPE(): List<Offset> { // representing of point in cartesian space
 
     val holes = mutableListOf<Offset>()
-    val offsetSize=100
-
-//    repeat(count) {
     val randomX = Random.nextFloat() * 1.dp
     var randomY = Random.nextFloat() * 100.dp
     holes.add(Offset(randomX.value, randomY.value))
 
-    // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (200), randomY.value + 100))
 
-    // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (400), randomY.value + 200))
-
-    // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (600), randomY.value))
 
-    // randomX = Random.nextFloat() * 200.dp
     randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (800), randomY.value - 100))
     return holes
 }
 
-fun generateRandomHoles2(): List<Offset> { // representing of point in cartesian space
+fun generateRandomHolesForPORTRAIT(): List<Offset> { // representing of point in cartesian space
 
     val holes = mutableListOf<Offset>()
-    val offsetSize=130
 
-//    repeat(count) {
     val randomX = Random.nextFloat() * 1.dp
-    var randomY = Random.nextFloat() * 1.dp
+    var randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value, randomY.value))
 
-    // randomX = Random.nextFloat() * 200.dp
-    randomY = Random.nextFloat() * 100.dp
+    randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (150), randomY.value + 100))
 
-    // randomX = Random.nextFloat() * 200.dp
-    randomY = Random.nextFloat() * 100.dp
+    randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (300), randomY.value + 200))
 
-    // randomX = Random.nextFloat() * 200.dp
-    randomY = Random.nextFloat() * 100.dp
+    randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value + (450), randomY.value))
 
-    // randomX = Random.nextFloat() * 200.dp
-    randomY = Random.nextFloat() * 100.dp
-    holes.add(Offset(randomX.value + (600), randomY.value + 100))
+    randomY = Random.nextFloat() * 200.dp
+    holes.add(Offset(randomX.value + (600), randomY.value +200))
     return holes
 }
 

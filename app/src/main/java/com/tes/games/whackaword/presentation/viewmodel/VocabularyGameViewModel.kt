@@ -2,20 +2,17 @@ package com.tes.games.whackaword.presentation.viewmodel
 
 import android.content.Context
 import android.media.MediaPlayer
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tes.games.whackaword.R
 import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.domain.repository.VocabularyGameRepository
-import com.tes.games.whackaword.presentation.view.components.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,25 +21,29 @@ class VocabularyGameViewModel @Inject constructor(
     private val context: Context
 ) : ViewModel() {
 
-    private val random = Random()
-    private val holes = MutableLiveData<List<VocabularyItem>>(listOf())
+   // private val random = Random()
+    //private val holes = MutableLiveData<List<VocabularyItem>>(listOf())
 
     private val _point: MutableStateFlow<Int> = MutableStateFlow(0)
     val point: StateFlow<Int> = _point
 
+    private val _playing: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val playing: StateFlow<Boolean> = _playing
+
+
     private val _level: MutableStateFlow<Int> = MutableStateFlow(0)
     val level: StateFlow<Int> = _level
 
-    private var successCount = 0
+    //private var successCount = 0
 
     var mediaPlayer = MediaPlayer()
 
-    private val _mediaPlayerState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val mediaPlayerState: StateFlow<Boolean> = _mediaPlayerState
+//    private val _mediaPlayerState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+//    val mediaPlayerState: StateFlow<Boolean> = _mediaPlayerState
 
 
-    private val _gameState: MutableStateFlow<GameState> = MutableStateFlow(GameState.Playing)
-    val gameState: StateFlow<GameState> = _gameState
+//    private val _gameState: MutableStateFlow<GameState> = MutableStateFlow(GameState.Playing)
+//    val gameState: StateFlow<GameState> = _gameState
 
     private val _vocabularyItems: MutableStateFlow<List<VocabularyItem?>> = MutableStateFlow(
         emptyList()
@@ -64,11 +65,15 @@ class VocabularyGameViewModel @Inject constructor(
     private val _resetGame: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val resetGame: StateFlow<Boolean> = _resetGame
 
-    private val _startGame: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val startGame: StateFlow<Boolean> = _startGame
+//    private val _startGame: MutableStateFlow<Boolean> = MutableStateFlow(false)
+//    val startGame: StateFlow<Boolean> = _startGame
 
     init {
         startGame()
+    }
+
+    fun setPlaying(){
+        _playing.value =true
     }
 
     private fun getList() {
@@ -123,12 +128,12 @@ class VocabularyGameViewModel @Inject constructor(
             )
 
             mediaPlayer.start()
-            _mediaPlayerState.value = true
+
             viewModelScope.launch(Dispatchers.IO) {
                 delay(2000) // Delay for 2 second
             }
             mediaPlayer.start()
-            _mediaPlayerState.value = true
+
             mediaPlayer.release()
             assetFileDescriptor.close()
         } else {
@@ -142,12 +147,12 @@ class VocabularyGameViewModel @Inject constructor(
             )
 
             mediaPlayer.start()
-            _mediaPlayerState.value = true
+
             viewModelScope.launch(Dispatchers.IO) {
                 delay(2000) // Delay for 2 second
             }
             mediaPlayer.start()
-            _mediaPlayerState.value = true
+
             mediaPlayer.release()
             assetFileDescriptor.close()
         }

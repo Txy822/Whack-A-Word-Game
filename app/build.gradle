@@ -9,6 +9,12 @@ android {
     namespace 'com.tes.games.whackaword'
     compileSdk 33
 
+    testOptions {
+        unitTests {
+            // Enable Mockito for JVM tests
+            includeAndroidResources = true
+        }
+    }
     defaultConfig {
         applicationId "com.tes.games.whackaword"
         minSdk 21
@@ -49,7 +55,6 @@ android {
 }
 
 dependencies {
-    def compose_version ="1.4.3"
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
@@ -76,6 +81,7 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:2.2.0"
 
     testImplementation 'org.mockito:mockito-core:5.3.1'
+    androidTestImplementation "org.mockito:mockito-core:5.3.1"
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10") {
             because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
@@ -86,5 +92,6 @@ dependencies {
     }
 
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
 
 }

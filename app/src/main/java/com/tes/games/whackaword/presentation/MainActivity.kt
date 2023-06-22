@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //VocabularyGameApp()
                     VocabularyGame()
                 }
             }
@@ -39,7 +38,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun VocabularyGame(){
     val navController = rememberNavController()
-    val viewModel : VocabularyGameViewModel= viewModel()
+    val viewModel : VocabularyGameViewModel = viewModel()
+
     NavGraph(navController, viewModel)
 }
 @Composable
