@@ -14,7 +14,7 @@ A simple Whack A Word game for vocabulary learning to kids.
   <img src="img/game2.png" alt="Screenshot 4" style="width: 66%;" />
   <img src="img/menue2.png" alt="Screenshot 5" style="width: 66%;" />
   <img src="img/emptyholes.png" alt="Screenshot 6" style="width: 66%;" />
-  <img src="img/menue2_portait.png" alt="Screenshot 7" style="width: 66%;" />
+  <img src="img/menue2_portrait.png" alt="Screenshot 7" style="width: 66%;" />
   <img src="img/game2_portrait.png" alt="Screenshot 8" style="width: 66%;" />
 
 </div>
