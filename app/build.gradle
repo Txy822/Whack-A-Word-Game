@@ -29,9 +29,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable false
+            // Other debug-related configuration if needed
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -92,6 +97,5 @@ dependencies {
     }
 
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-
 
 }

@@ -72,6 +72,7 @@ class VocabularyGameViewModelTest {
             VocabularyItem("Cake", R.drawable.fc_cake, R.raw.fc_cake),
             VocabularyItem("Tomato",R.drawable.fc_tomato, R.raw.fc_tomato)
         )
+        //this list is used as twice shuffling makes list different
         val vocabularyItems2 = listOf(
             VocabularyItem("Apple",R.drawable.fc_apple, R.raw.fc_apple),
         )

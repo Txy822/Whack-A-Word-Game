@@ -35,22 +35,17 @@ fun SplashScreen(navController: NavController) {
         targetValue = 360f,
         animationSpec = infiniteRepeatable(tween(durationMillis = 2000), RepeatMode.Restart)
     )
-
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFCCBA85)).padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Add your logo icon here
         Icon(
             Icons.Default.Favorite,
             contentDescription = "Logo",
             modifier = Modifier
                 .size(100.dp)
                 .rotate(rotation)
-
         )
-
-
         Text(
             text = "Whack             A Word",
             fontWeight = FontWeight.Bold,
@@ -67,5 +62,6 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         delay(2000) // Delay for 2 seconds
         navController.navigate(Screen.MenuScreen.route)
+        navController.clearBackStack(Screen.SplashScreen.route)
     }
 }

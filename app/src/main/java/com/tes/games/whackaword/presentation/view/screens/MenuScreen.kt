@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +40,6 @@ fun MenuScreen(
     navController: NavController= rememberNavController(),
     viewModel: VocabularyGameViewModel = viewModel()
 ) {
-    //val viewModel: VocabularyGameViewModel = viewModel()
     val level by viewModel.level.collectAsState()
     val score by viewModel.point.collectAsState()
     val gameInProgress by viewModel.playing.collectAsState()
@@ -46,6 +47,7 @@ fun MenuScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(Color(0xFFCCBA85)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -69,7 +71,7 @@ fun MenuScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .height(300.dp)
-                    .width(400.dp)
+                    .width(600.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(color = Color(0xFFCCBA85))
             )
@@ -79,7 +81,7 @@ fun MenuScreen(
         Box(
             modifier = Modifier
                 .height(60.dp)
-                .width(400.dp)
+                .width(500.dp)
                 .background(color = colorResource(id = R.color.sky)),
             contentAlignment = Alignment.Center
         ) {
@@ -114,10 +116,10 @@ fun MenuScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Start Game Button
         Button(
             onClick = { navController.navigate(Screen.GameScreen.route)
-                       viewModel.setPlaying()
+                navController.clearBackStack(Screen.SplashScreen.route)
+                viewModel.setPlaying()
                       },
             modifier = Modifier
                 .width(300.dp)

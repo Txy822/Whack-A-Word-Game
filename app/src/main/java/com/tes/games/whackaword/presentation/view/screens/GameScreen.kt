@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -62,10 +64,9 @@ import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
-//val   showListingViewModel: SearchShowsViewModel = hiltViewModel()
 @Composable
 fun GameScreen(
-    navController: NavController= rememberNavController(),
+    navController: NavController = rememberNavController(),
     viewModel: VocabularyGameViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -73,22 +74,22 @@ fun GameScreen(
     val screenOrientation = configuration.orientation
     val holes = if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
         remember { generateRandomHolesForLANDSCAPE() }
-    }
-    else {
+    } else {
         remember { generateRandomHolesForPORTRAIT() }
     }
     val createHolesState = remember { mutableStateOf(false) }
     val createEmptyHolesState = remember { mutableStateOf(false) }
-   // val viewModel: VocabularyGameViewModel = viewModel()
     val selectedVocabularyItems by viewModel.selectedVocabularyItems.collectAsState()
     val targetVocabularyItem by viewModel.targetVocabularyItem.collectAsState()
     val points by viewModel.point.collectAsState()
     val level by viewModel.level.collectAsState()
 
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFFCCBA85))) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(Color(0xFFCCBA85))
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,16 +98,15 @@ fun GameScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             Row() {
-
                 Text(
-                    modifier = Modifier.padding(top=20.dp),
+                    modifier = Modifier.padding(top = 20.dp),
                     text = "Points: ",
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
                     color = Color.Black
                 )
                 Text(
-                    modifier = Modifier.padding(top=20.dp),
+                    modifier = Modifier.padding(top = 20.dp),
                     text = "$points       ",
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
@@ -114,14 +114,14 @@ fun GameScreen(
                 )
 
                 Text(
-                    modifier = Modifier.padding(top=20.dp),
+                    modifier = Modifier.padding(top = 20.dp),
                     text = "Level: ",
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
                     color = Color.Black
                 )
                 Text(
-                    modifier = Modifier.padding(top=20.dp),
+                    modifier = Modifier.padding(top = 20.dp),
                     text = "$level",
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
@@ -129,24 +129,28 @@ fun GameScreen(
                 )
                 Spacer(modifier = Modifier.width(300.dp))
                 Button(
-                    modifier = Modifier.padding(top= 20.dp),
-                    onClick = { navController.navigate(Screen.MenuScreen.route) },
-                    colors = ButtonDefaults.buttonColors(contentColor = Color.Black, containerColor = Color.Transparent),
+                    modifier = Modifier.padding(top = 20.dp),
+                    onClick = {
+                        navController.navigate(Screen.MenuScreen.route)
+                        navController.clearBackStack(Screen.SplashScreen.route)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = Color.Black,
+                        containerColor = Color.Transparent
+                    ),
                 )
 
                 {
-                        Text(
-                            modifier = Modifier
-                                .background(Color.Transparent),
-                            text = "Exit",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 40.sp,
-                            color = Color.Black
-                        )
-
+                    Text(
+                        modifier = Modifier
+                            .background(Color.Transparent),
+                        text = "Exit",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 40.sp,
+                        color = Color.Black
+                    )
                 }
             }
-
         }
         CreateBox(
             holes,
@@ -159,9 +163,7 @@ fun GameScreen(
         ) {
             viewModel.restartGame()
         }
-
     }
-
 }
 
 @Composable
@@ -182,11 +184,11 @@ fun CreateBox(
                 .padding(top = 20.dp, bottom = 100.dp, end = 100.dp)
                 .background(Color(0xFFCCBA85)) // Green ground color
         ) {
-
             LaunchedEffect(Unit) {
                 while (true) {
                     // Create empty hole before new holes with images
                     createEmptyHolesState.value = true
+                    // Wait for 2 seconds
                     delay(2000)
                     restartGame()
                     createHolesState.value = true
@@ -253,6 +255,7 @@ fun CreateHoles(
     targetVocabularyItem: VocabularyItem?
 ) {
 
+    // random numbers to keep track of selected its
     val numberOfHoles = listOf(0, 1, 2, 3, 4)
     val randomSelectedNumberOfHoles =
         numberOfHoles.shuffled().take(selectedVocabularyItems.size)////1,4,3
@@ -301,7 +304,6 @@ fun Hole(
     clicked: () -> Unit
 ) {
 
-
     val configuration = LocalConfiguration.current
     val screenOrientation = configuration.orientation
     // Update UI based on orientation change
@@ -313,7 +315,6 @@ fun Hole(
             modifier = Modifier
                 .size(holeSize)
                 .offset(position.x.dp, position.y.dp)
-//            .border(width = 2.dp, color = Color.Magenta)
 
         ) {
             drawOval(
@@ -335,13 +336,10 @@ fun Hole(
     } else {
         // Handle portrait orientation
         val holeSize = 150.dp
-        //val position= position/ 2F
-//    OvalWithBorder()
         Canvas(
             modifier = Modifier
                 .size(holeSize)
                 .offset(position.x.dp, position.y.dp)
-//            .border(width = 2.dp, color = Color.Magenta)
 
         ) {
             drawOval(
@@ -397,7 +395,6 @@ fun ImageCard(
 
         colors = CardDefaults.cardColors(colorResource(id = R.color.light_ray)),
         elevation = CardDefaults.cardElevation(1.dp),
-//        shape = RoundedCornerShape(16.dp),
         shape = MaterialTheme.shapes.medium.copy(
             topStart = CornerSize(16.dp),
             topEnd = CornerSize(16.dp),
@@ -412,8 +409,7 @@ fun ImageCard(
         if (targetClicked.value) {
             val targetVocabularyItem = VocabularyItem("", 0, R.raw.correct)
             MediaPlayerComponent(context, targetVocabularyItem)
-        }
-        else if(nonTargetClicked.value){
+        } else if (nonTargetClicked.value) {
             val targetVocabularyItem = VocabularyItem("", 0, R.raw.sound__failure)
             MediaPlayerComponent(context, targetVocabularyItem)
         }
@@ -479,7 +475,7 @@ fun generateRandomHolesForPORTRAIT(): List<Offset> { // representing of point in
     holes.add(Offset(randomX.value + (450), randomY.value))
 
     randomY = Random.nextFloat() * 200.dp
-    holes.add(Offset(randomX.value + (600), randomY.value +200))
+    holes.add(Offset(randomX.value + (600), randomY.value + 200))
     return holes
 }
 
