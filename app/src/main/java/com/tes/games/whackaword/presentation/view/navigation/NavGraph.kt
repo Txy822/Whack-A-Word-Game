@@ -11,13 +11,13 @@ import com.tes.games.whackaword.presentation.viewmodel.VocabularyGameViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController, viewModel: VocabularyGameViewModel) {
-    NavHost(navController, startDestination = Screen.MenuScreen.route) {
+    NavHost(navController, startDestination = Screen.SplashScreen.route) {
         composable(Screen.MenuScreen.route) {
             MenuScreen(navController, viewModel =viewModel)
         }
         composable(Screen.GameScreen.route) {
            GameScreen(navController = navController, viewModel =viewModel) }
         composable(Screen.SplashScreen.route) {
-            SplashScreen({},{}) }
+            SplashScreen(navController) }
     }
 }
