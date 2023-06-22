@@ -7,7 +7,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,18 +61,41 @@ fun GameScreen2() {
     val viewModel: VocabularyGameViewModel = viewModel()
     val selectedVocabularyItems by viewModel.selectedVocabularyItems.collectAsState()
     val targetVocabularyItem by viewModel.targetVocabularyItem.collectAsState()
+    val points by viewModel.point.collectAsState()
+    val level by viewModel.level.collectAsState()
 
-    createBox(
-        holes,
-        selectedVocabularyItems,
-        viewModel,
-        context,
-        targetVocabularyItem,
-        createEmptyHolesState,
-        createHolesState,
-    ) {
-        viewModel.restartGame()
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFCCBA85))) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth().height(200.dp)
+                .background(colorResource(id = R.color.sky)),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Text(
+                modifier = Modifier.padding(top=20.dp),
+                text = " Points: $points            Level: $level ",
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                color = Color.Black
+            )
+        }
+        createBox(
+            holes,
+            selectedVocabularyItems,
+            viewModel,
+            context,
+            targetVocabularyItem,
+            createEmptyHolesState,
+            createHolesState,
+        ) {
+            viewModel.restartGame()
+        }
+
     }
+
 }
 
 @Composable
@@ -85,14 +112,14 @@ fun createBox(
     if (selectedVocabularyItems.isNotEmpty()) {
         Box(
             modifier = Modifier
-                .padding(top = 200.dp)
-                .fillMaxSize()
+                .fillMaxWidth()
+                .padding(top = 20.dp, bottom = 100.dp, end = 100.dp)
                 .background(Color(0xFFCCBA85)) // Green ground color
         ) {
 
             LaunchedEffect(Unit) {
                 while (true) {
-                    // Create new holes
+                    // Create empty hole before new holes with images
                     createEmptyHolesState.value = true
                     delay(2000)
                     restartGame()
@@ -161,7 +188,8 @@ fun createHoles(
 ) {
 
     val numberOfHoles = listOf(0, 1, 2, 3, 4)
-    val randomSelectedNumberOfHoles = numberOfHoles.shuffled().take(selectedVocabularyItems.size)////1,4,3
+    val randomSelectedNumberOfHoles =
+        numberOfHoles.shuffled().take(selectedVocabularyItems.size)////1,4,3
     var j = 0
     for ((i, hole) in holes.withIndex()) {
         if (randomSelectedNumberOfHoles.contains(i)) {
@@ -172,7 +200,8 @@ fun createHoles(
                     cardVisible = true,
                     img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
                 ) {
-                    viewModel.increaseLevel()
+                    viewModel.increasePoint()
+
                 }
             } else {
                 Hole(
@@ -181,7 +210,7 @@ fun createHoles(
                     cardVisible = true,
                     img = selectedVocabularyItems[j]?.image ?: R.drawable.ic_launcher_background
                 ) {
-                    viewModel.increaseLevel()
+                    viewModel.decreasePoint()
                 }
             }
             j++
@@ -241,6 +270,8 @@ fun ImageCard(
     clicked: () -> Unit
 ) {
     val targetClicked = remember { mutableStateOf(false) }
+    var clickCounter by remember { mutableStateOf(0) }
+
     val context = LocalContext.current
     Card(
         modifier = Modifier
@@ -248,9 +279,12 @@ fun ImageCard(
             .padding(16.dp)
             .offset(position.x.dp + 110.dp, position.y.dp - 110.dp)
             .clickable {
-                if (isTargetHole) {
+                clickCounter += 1
+                if (clickCounter == 1) {
                     clicked()
-                    targetClicked.value = true
+                    if (isTargetHole) {
+                        targetClicked.value = true
+                    }
                 }
             },
 
@@ -279,19 +313,19 @@ fun ImageCard(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            val currentImageId  = if (targetClicked.value) {
+            val currentImageId = if (targetClicked.value) {
                 R.drawable.tick
             } else {
                 img
             }
-                Image(
-                    painter = painterResource(id = currentImageId),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = colorResource(id = R.color.light_ray))
-                )
+            Image(
+                painter = painterResource(id = currentImageId),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(color = colorResource(id = R.color.light_ray))
+            )
         }
     }
 }
@@ -299,7 +333,7 @@ fun ImageCard(
 fun generateRandomHoles(count: Int): List<Offset> { // representing of point in cartesian space
     val holes = mutableListOf<Offset>()
 //    repeat(count) {
-    val randomX = Random.nextFloat() * 200.dp
+    val randomX = Random.nextFloat() * 1.dp
     var randomY = Random.nextFloat() * 200.dp
     holes.add(Offset(randomX.value, randomY.value))
 

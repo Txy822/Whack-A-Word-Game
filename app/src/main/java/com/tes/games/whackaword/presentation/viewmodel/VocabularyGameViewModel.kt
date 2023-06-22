@@ -7,11 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tes.games.whackaword.domain.model.VocabularyItem
 import com.tes.games.whackaword.domain.repository.VocabularyGameRepository
-import com.tes.games.whackaword.presentation.view.components.GameResult
 import com.tes.games.whackaword.presentation.view.components.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +26,9 @@ class VocabularyGameViewModel @Inject constructor(
     private val random = Random()
     private val holes = MutableLiveData<List<VocabularyItem>>(listOf())
 
-    //var level = 1
+    private val _point: MutableStateFlow<Int> = MutableStateFlow(0)
+    val point: StateFlow<Int> = _point
+
     private val _level: MutableStateFlow<Int> = MutableStateFlow(0)
     val level: StateFlow<Int> = _level
 
@@ -58,32 +58,14 @@ class VocabularyGameViewModel @Inject constructor(
     val targetVocabularyItem: StateFlow<VocabularyItem?> = _targetVocabularyItem
 
 
-    private val _timerValue: MutableStateFlow<Int> = MutableStateFlow(0)
-    val timerValue: StateFlow<Int> = _timerValue
-
     private val _resetGame: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val resetGame: StateFlow<Boolean> = _resetGame
 
     private val _startGame: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val startGame: StateFlow<Boolean> = _startGame
 
-
-    private val _gameResult: MutableStateFlow<GameResult?> = MutableStateFlow(null)
-    val gameResult: StateFlow<GameResult?> = _gameResult
-
-    private var timerJob: Job? = null
-    private var timerCounter = 0
-
     init {
-        //  playMediaVocabulary(context= context)
-
-//        getList()
-//        getSelectedVocabularyItems(3)
-//        getTargetVocabularyItem()
-//        playMediaVocabulary(context= context)
-//        _startGame.value =true
-        startGame2()
-        // resetGame2()
+        startGame()
     }
 
     private fun getList() {
@@ -130,106 +112,39 @@ class VocabularyGameViewModel @Inject constructor(
         assetFileDescriptor.close()
     }
 
-    fun increaseLevel() {
-        _level.value = _level.value + 1
+
+    fun increasePoint() {
+
+        _point.value = point.value + 1
+        levelConverter(_point.value)
     }
 
-    fun decreaseLevel() {
-        _level.value = _level.value - 1
+    fun decreasePoint() {
+        _point.value = point.value - 1
     }
 
-    private fun startGame2() {
-        //  _startGame.value = true
+    private fun startGame() {
         getList()
-        getSelectedVocabularyItems(levelConverter(_level.value))
+        getSelectedVocabularyItems(_level.value)
         getTargetVocabularyItem()
         playMediaVocabulary(context = context)
     }
 
-    fun resetGame2() {
-        startGame2()
-        // Reset game state and result
-        _gameState.value = GameState.Playing
-        _gameResult.value = null
-
-        // Start the timer
-        timerCounter = 0
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (timerCounter < 10) {
-                delay(1000)
-                timerCounter++
-                _timerValue.value = timerCounter
-                _resetGame.value = true
-            }
-            onTimerFinish()
+    private fun levelConverter(point: Int){
+        if (point < 3) {
+           _level.value = 1
         }
-    }
-
-    fun startGame() {
-        // Reset game state and result
-        _gameState.value = GameState.Playing
-        _gameResult.value = null
-
-        // Start the timer
-        timerCounter = 0
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (timerCounter < 10) {
-                delay(1000)
-                timerCounter++
-                _timerValue.value = timerCounter
-                _resetGame.value = true
-            }
-            onTimerFinish()
-        }
-
-        // Select a random vocabulary item
-//        selectRandomVocabularyItem()
-    }
-
-    private fun onTimerFinish() {
-        startGame2()
-//        if (_gameState.value == GameState.Playing) {
-//            retreatVocabularyItems()
-//            _gameState.value = GameState.Failure
-//            _gameResult.value = GameResult.Lose
-//        }
-    }
-
-    fun resetGame() {
-        timerJob?.cancel()
-        _gameResult.value = null
-    }
-
-    private fun levelConverter(level: Int): Int {
-        return if (level < 3) {
-            1
-        } else if (level < 6) {
-            2
+        else if (point < 6) {
+            _level.value = 2
         } else {
-            3
+            _level.value =  3
         }
-    }
-
-    private fun retreatVocabularyItems() {
-
-        getSelectedVocabularyItems(levelConverter(_level.value))
-        /*
-        // Retreat all the vocabulary items into their holes
-        val currentHoles = holes.value ?: return
-        val updatedHoles = currentHoles.map { vocabularyItem ->
-            vocabularyItem.copy()
-        }
-        holes.value = updatedHoles
-
-        */
     }
 
     fun restartGame() {
         _resetGame.value = true
         getList()
-        getSelectedVocabularyItems(levelConverter(_level.value))
+        getSelectedVocabularyItems(_level.value)
         getTargetVocabularyItem()
     }
 
