@@ -3,18 +3,19 @@
 A simple Whack A Word game for vocabulary learning to kids. 
 
 - It will increase your score by one as you keep tapping the target word and decrease by the same amount if you miss. 
+- It is developed for Android Tablet
 
-## Android  UI Screenshots
+## Android Tablet UI Screenshots
 
 <div style="display: flex; justify-content: center;">
   <img src="img/splash.png" alt="Screenshot 1" style="width: 66%;" />
   <img src="img/menue1.png" alt="Screenshot 2" style="width: 66%;" />
-  <img src="img/game1g.png" alt="Screenshot 3" style="width: 66%;" />
+  <img src="img/game1.png" alt="Screenshot 3" style="width: 66%;" />
   <img src="img/game2.png" alt="Screenshot 4" style="width: 66%;" />
   <img src="img/menue2.png" alt="Screenshot 5" style="width: 66%;" />
   <img src="img/emptyholes.png" alt="Screenshot 5" style="width: 66%;" />
-  <img src="img/menue2_portait.png" alt="Screenshot 6" style="width: 33%;" />
-  <img src="img/game2_portrait.png" alt="Screenshot 6" style="width: 33%;" />
+  <img src="img/menue2_portait.png" alt="Screenshot 6" style="width: 66%;" />
+  <img src="img/game2_portrait.png" alt="Screenshot 6" style="width: 66%;" />
 
 </div>
 
